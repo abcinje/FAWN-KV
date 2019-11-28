@@ -56,7 +56,7 @@ namespace fawn {
         iov[2].iov_len = length;
 
         if (lseek(fd_, offset, SEEK_SET) != offset) {
-            fprintf(stderr, "Could not seek to offset %"PRIu64": %s\n",
+            fprintf(stderr, "Could not seek to offset %" PRIu64 ": %s\n",
                     offset, strerror(errno));
         }
 
@@ -79,14 +79,14 @@ namespace fawn {
 
         if ((uint64_t)pwrite64(fd_, &delete_header, sizeof(struct DataHeader),
                                offset) != sizeof(struct DataHeader)) {
-            fprintf(stderr, "Could not write delete header at position %"PRIu64": %s\n",
+            fprintf(stderr, "Could not write delete header at position %" PRIu64 ": %s\n",
                     (uint64_t)offset, strerror(errno));
             return false;
         }
 
         if ((uint64_t)pwrite64(fd_, key, key_len,
                                offset + sizeof(struct DataHeader)) != key_len) {
-            fprintf(stderr, "Could not write delete header at position %"PRIu64": %s\n",
+            fprintf(stderr, "Could not write delete header at position %" PRIu64 ": %s\n",
                     (uint64_t)offset + sizeof(struct DataHeader), strerror(errno));
             return false;
         }
@@ -150,7 +150,7 @@ namespace fawn {
             //printf("GDOEX pread64: %x  (%d)\n", datapos + sizeof(DataHeader), length);
             if ((uint64_t)pread64(fd_, mdata, length, offset + key_len + sizeof(struct DataHeader)) !=
                 length) {
-                fprintf(stderr, "Could not read data at position %"PRIu64": %s\n",
+                fprintf(stderr, "Could not read data at position %" PRIu64 ": %s\n",
                         offset + sizeof(DataHeader), strerror(errno));
                 free(mdata);
                 return false;
