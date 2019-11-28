@@ -5,7 +5,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <string>
-#include <transport/TTransportUtils.h>
+#include <thrift/transport/TTransportUtils.h>
 
 #include "dbid.h"
 #include "FawnKVFrontend.h"
@@ -56,7 +56,7 @@ private:
     health_status cardiacState;
     join_type joinState;
     int beatsMissed;
-    shared_ptr<TTransport> be_transport;
+    boost::shared_ptr<TTransport> be_transport;
     bool connected;
 };
 

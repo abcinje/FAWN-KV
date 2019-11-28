@@ -16,8 +16,8 @@
 #include <signal.h>
 #include <tbb/atomic.h>
 #include <tbb/concurrent_queue.h>
-#include <transport/TTransportUtils.h>
-#include <server/TThreadedServer.h>
+#include <thrift/transport/TTransportUtils.h>
+#include <thrift/server/TThreadedServer.h>
 
 #include "dbid.h"
 #include "fawnds.h"
@@ -72,8 +72,8 @@ typedef struct interval_database {
     uint32_t last_ack;
     uint32_t last_put;
 
-    atomic<uint32_t> sequence;
-    atomic<bool> valid;
+    tbb::atomic<uint32_t> sequence;
+    tbb::atomic<bool> valid;
     string vid; // virtual id associated with this range
 
     pthread_rwlock_t dbLock;
@@ -120,8 +120,8 @@ public:
 
 class node_mgr : virtual public FawnKVBackendIf {
 private:
-    shared_ptr<TTransport> fe_transport;
-    shared_ptr<TTransport> manager_transport;
+    boost::shared_ptr<TTransport> fe_transport;
+    boost::shared_ptr<TTransport> manager_transport;
     vector<interval_db*> dbs;
     bool overwrite;
     Ring *ring;
@@ -132,7 +132,7 @@ private:
     pthread_mutex_t count_mutex;
     pthread_cond_t count_threshold_cv;
 
-    atomic<uint32_t> num_puts, num_gets, num_put_ws, total_num_puts, total_num_gets, total_num_put_ws;
+    tbb::atomic<uint32_t> num_puts, num_gets, num_put_ws, total_num_puts, total_num_gets, total_num_put_ws;
     struct timeval *p_start, *p_end;
     fstream stat_file;
     uint32_t time;
@@ -150,7 +150,7 @@ private:
     map<uint32_t, uint64_t> msgid_producer_map;
     map<uint32_t, uint64_t> msgid_consumer_map;
 
-    map<string, atomic<uint32_t> > vid_precopy_map;
+    map<string, tbb::atomic<uint32_t> > vid_precopy_map;
     map<string, int32_t > vid_extension_map;
     vector<string> m_VnodeIDs;
     uint32_t curr_vnode;
@@ -218,7 +218,7 @@ public:
     string filebase;
     uint32_t num_precopies;
     bool unknown_ids;
-    atomic<uint32_t> num_network;
+    tbb::atomic<uint32_t> num_network;
     CQTYPE<GetResponseObj*> get_resp_queue;
     pthread_mutex_t socket_lock;
 

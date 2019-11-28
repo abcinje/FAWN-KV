@@ -37,8 +37,8 @@ namespace fawn {
 
     private:
         static const uint64_t num_records_ = 5000000;
-        static const double max_deleted_ratio_ = .9;
-        static const double max_load_factor_ = .8;
+        static constexpr double max_deleted_ratio_ = .9;
+        static constexpr double max_load_factor_ = .8;
     };
 
     TEST_F(FawnDSTest, TestSimpleInsertRetrieve) {

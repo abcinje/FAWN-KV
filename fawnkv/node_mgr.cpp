@@ -12,15 +12,15 @@
 #include <errno.h>
 #include <netinet/tcp.h>
 
-#include <concurrency/ThreadManager.h>
-#include <concurrency/PosixThreadFactory.h>
-#include <protocol/TBinaryProtocol.h>
-#include <server/TSimpleServer.h>
-#include <server/TThreadPoolServer.h>
-#include <server/TThreadedServer.h>
-#include <transport/TServerSocket.h>
-#include <transport/TTransportUtils.h>
-#include <transport/TSocket.h>
+#include <thrift/concurrency/ThreadManager.h>
+#include <thrift/concurrency/PosixThreadFactory.h>
+#include <thrift/protocol/TBinaryProtocol.h>
+#include <thrift/server/TSimpleServer.h>
+#include <thrift/server/TThreadPoolServer.h>
+#include <thrift/server/TThreadedServer.h>
+#include <thrift/transport/TServerSocket.h>
+#include <thrift/transport/TTransportUtils.h>
+#include <thrift/transport/TSocket.h>
 
 #include "fawnnet.h"
 #include "node_mgr.h"
@@ -91,10 +91,10 @@ void node_mgr::init(string managerIP, string localIP, string stat_filename)
     }
 
 
-    shared_ptr<TTransport> socket(new TSocket(managerIP.data(), MANAGER_PORT_BASE));
-    shared_ptr<TTransport> transport(new TBufferedTransport(socket));
+    boost::shared_ptr<TTransport> socket(new TSocket(managerIP.data(), MANAGER_PORT_BASE));
+    boost::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
     manager_transport = transport;
-    shared_ptr<TProtocol> protocol(new TBinaryProtocol(manager_transport));
+    boost::shared_ptr<TProtocol> protocol(new TBinaryProtocol(manager_transport));
     manager = new FawnKVManagerClient(protocol);
 
 
@@ -136,9 +136,9 @@ node_mgr::~node_mgr()
 
 FawnKVFrontendClient* node_mgr::connectTCP_FE(string IP, int port)
 {
-    shared_ptr<TTransport> socket(new TSocket(IP.data(), port));
-    shared_ptr<TTransport> transport(new TBufferedTransport(socket));
-    shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
+    boost::shared_ptr<TTransport> socket(new TSocket(IP.data(), port));
+    boost::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
+    boost::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
     FawnKVFrontendClient* frontend = new FawnKVFrontendClient(protocol);
 
     try {
@@ -152,9 +152,9 @@ FawnKVFrontendClient* node_mgr::connectTCP_FE(string IP, int port)
 
 FawnKVBackendClient* node_mgr::connectTCP(string IP, int port)
 {
-    shared_ptr<TTransport> socket(new TSocket(IP.data(), port));
-    shared_ptr<TTransport> transport(new TBufferedTransport(socket));
-    shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
+    boost::shared_ptr<TTransport> socket(new TSocket(IP.data(), port));
+    boost::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
+    boost::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
     FawnKVBackendClient* backend = new FawnKVBackendClient(protocol);
 
     try {
@@ -658,11 +658,11 @@ void *localServerThreadLoop(void *p)
 {
     node_mgr *nm = (node_mgr*) p;
 
-    shared_ptr<node_mgr> handler(nm);
-    shared_ptr<TProcessor> processor(new FawnKVBackendProcessor(handler));
-    shared_ptr<TServerTransport> serverTransport(new TServerSocket(nm->myPort));
-    shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
-    shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
+    boost::shared_ptr<node_mgr> handler(nm);
+    boost::shared_ptr<TProcessor> processor(new FawnKVBackendProcessor(handler));
+    boost::shared_ptr<TServerTransport> serverTransport(new TServerSocket(nm->myPort));
+    boost::shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
+    boost::shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
     cout << "Starting server on " << nm->myPort << endl;
 
     nm->server = new TThreadedServer(processor, serverTransport, transportFactory, protocolFactory);

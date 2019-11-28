@@ -109,12 +109,12 @@ namespace fawn {
         uint64_t db_size = header_size() + sizeof(struct HashEntry) * max_entries;
 
         printf("CreateFawnDS table information:\n"
-               "\t hashtablesize: %"PRIu64"\n"
-               "\t num_entries: %"PRIu64"\n"
-               "\t deleted entries: %"PRIu64"\n"
-               "\t Database header size %"PRIu64"B\n"
-               "\t Total db size %"PRIu64"B\n"
-               "\t Maximum number of entries: %"PRIu64"\n",
+               "\t hashtablesize: %" PRIu64 "\n"
+               "\t num_entries: %" PRIu64 "\n"
+               "\t deleted entries: %" PRIu64 "\n"
+               "\t Database header size %" PRIu64 "B\n"
+               "\t Total db size %" PRIu64 "B\n"
+               "\t Maximum number of entries: %" PRIu64 "\n",
                hash_table_size, num_entries, deleted_entries,
                header_size(), db_size, max_entries);
 
@@ -122,7 +122,7 @@ namespace fawn {
         // requires NUMPAGES(sizeof(struct DbHeader)) +
         // sizeof(struct HashEntry) * max_entries.
         if (ftruncate(fd, (off_t)db_size) == -1) {
-            fprintf(stderr, "Could not extend file to %"PRIu64" bytes: %s\n",
+            fprintf(stderr, "Could not extend file to %" PRIu64 " bytes: %s\n",
                     db_size, strerror(errno));
         }
         lseek(fd, 0, SEEK_SET);
@@ -171,7 +171,7 @@ namespace fawn {
         ds->header_->data_start_point = db_size;
 
         if (lseek(ds->fd_, db_size, SEEK_SET) != (off_t)db_size) {
-            fprintf(stderr, "Could not seek to offset %"PRIu64": %s\n",
+            fprintf(stderr, "Could not seek to offset %" PRIu64 ": %s\n",
                     db_size, strerror(errno));
         }
 
@@ -268,7 +268,7 @@ namespace fawn {
         uint64_t length = sizeof(struct DbHeader);
         uint64_t offset = 0;
         if ((uint64_t)pread64(fd_, header_, length, offset) != length) {
-            fprintf(stderr, "Could not read header for data at position %"PRIu64": %s\n",
+            fprintf(stderr, "Could not read header for data at position %" PRIu64 ": %s\n",
                     offset, strerror(errno));
             return false;
         }
@@ -621,7 +621,7 @@ namespace fawn {
                 DataHeader data_header;
                 string key;
                 if (!datastore->ReadIntoHeader(current_offset, data_header, key)) {
-                    fprintf(stderr, "ReadIntoHeader failed at offset %"PRIu64".\n",
+                    fprintf(stderr, "ReadIntoHeader failed at offset %" PRIu64 ".\n",
                             current_offset);
                     delete new_db;
                     if (unlink(temp_filename.c_str()) == -1) {
@@ -757,7 +757,7 @@ namespace fawn {
         DataHeader data_header;
         string key;
         if (!datastore->ReadIntoHeader(currSplit, data_header, key)) {
-            fprintf(stderr, "ReadIntoHeader failed at offset %"PRIu64".\n",
+            fprintf(stderr, "ReadIntoHeader failed at offset %" PRIu64 ".\n",
                     currSplit);
             return false;
         }
@@ -843,7 +843,7 @@ namespace fawn {
                 DataHeader data_header;
                 string key;
                 if (!datastore->ReadIntoHeader(current_offset, data_header, key)) {
-                    fprintf(stderr, "ReadIntoHeader failed at offset %"PRIu64".\n",
+                    fprintf(stderr, "ReadIntoHeader failed at offset %" PRIu64 ".\n",
                             current_offset);
                     return false;
                 }

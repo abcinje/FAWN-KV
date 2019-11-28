@@ -36,7 +36,7 @@ vector<uint32_t> *lt2 = new vector<uint32_t>;
 bool consistency_test = false;
 vector<string> put_values;
 bool p = false;
-atomic<uint32_t> outstanding;
+tbb::atomic<uint32_t> outstanding;
 bool b_done = false;
 struct timeval start_time;
 struct timeval end_time;

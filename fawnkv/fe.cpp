@@ -3,10 +3,10 @@
 
 FrontEnd::FrontEnd(string managerIP, string myIP, int myPort) : myIP(myIP), myPort(myPort)
 {
-    shared_ptr<TTransport> socket(new TSocket(managerIP.data(), MANAGER_PORT_BASE));
-    shared_ptr<TTransport> transport(new TBufferedTransport(socket));
+    boost::shared_ptr<TTransport> socket(new TSocket(managerIP.data(), MANAGER_PORT_BASE));
+    boost::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
     manager_transport = transport;
-    shared_ptr<TProtocol> protocol(new TBinaryProtocol(manager_transport));
+    boost::shared_ptr<TProtocol> protocol(new TBinaryProtocol(manager_transport));
     manager = new FawnKVManagerClient(protocol);
 
     while (1) {
@@ -203,9 +203,9 @@ FawnKVBackendClient* FrontEnd::connect_to_backend(const string& nip)
 
 FawnKVBackendClient* FrontEnd::connectTCP(string IP, int port)
 {
-    shared_ptr<TTransport> socket(new TSocket(IP.data(), port));
-    shared_ptr<TTransport> transport(new TBufferedTransport(socket));
-    shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
+    boost::shared_ptr<TTransport> socket(new TSocket(IP.data(), port));
+    boost::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
+    boost::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
     FawnKVBackendClient* backend = new FawnKVBackendClient(protocol);
 
     try {
@@ -224,11 +224,11 @@ void *localServerThreadLoop(void *p)
 {
     FrontEnd *fe = (FrontEnd*) p;
 
-    shared_ptr<FrontEnd> handler(fe);
-    shared_ptr<TProcessor> processor(new FawnKVFrontendProcessor(handler));
-    shared_ptr<TServerTransport> serverTransport(new TServerSocket(fe->myPort));
-    shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
-    shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
+    boost::shared_ptr<FrontEnd> handler(fe);
+    boost::shared_ptr<TProcessor> processor(new FawnKVFrontendProcessor(handler));
+    boost::shared_ptr<TServerTransport> serverTransport(new TServerSocket(fe->myPort));
+    boost::shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
+    boost::shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
 
     TThreadedServer server(processor, serverTransport, transportFactory, protocolFactory);
     server.serve();

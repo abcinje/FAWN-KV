@@ -1,14 +1,14 @@
 /* -*- Mode: C++; c-basic-offset: 4; indent-tabs-mode: nil -*- */
-#include <transport/TBufferTransports.h>
-#include <concurrency/ThreadManager.h>
-#include <concurrency/PosixThreadFactory.h>
-#include <protocol/TBinaryProtocol.h>
-#include <server/TSimpleServer.h>
-#include <server/TThreadPoolServer.h>
-#include <server/TThreadedServer.h>
-#include <transport/TServerSocket.h>
-#include <transport/TTransportUtils.h>
-#include <transport/TSocket.h>
+#include <thrift/transport/TBufferTransports.h>
+#include <thrift/concurrency/ThreadManager.h>
+#include <thrift/concurrency/PosixThreadFactory.h>
+#include <thrift/protocol/TBinaryProtocol.h>
+#include <thrift/server/TSimpleServer.h>
+#include <thrift/server/TThreadPoolServer.h>
+#include <thrift/server/TThreadedServer.h>
+#include <thrift/transport/TServerSocket.h>
+#include <thrift/transport/TTransportUtils.h>
+#include <thrift/transport/TSocket.h>
 
 #include "FawnKVServerHandler.h"
 
@@ -100,9 +100,9 @@ ClientData* FawnKVServerHandler::get_client(const int32_t cid) {
 
 int32_t FawnKVServerHandler::init(const std::string& clientIP, const int32_t port) {
     cout << "Connection from " << clientIP << ":" << port << endl;
-    shared_ptr<TTransport> socket(new TSocket(clientIP.data(), port));
-    shared_ptr<TTransport> transport(new TBufferedTransport(socket));
-    shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
+    boost::shared_ptr<TTransport> socket(new TSocket(clientIP.data(), port));
+    boost::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
+    boost::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
     FawnKVAppClient *fc = new FawnKVAppClient(protocol);
 
     while(1) {
@@ -246,11 +246,11 @@ int main(int argc, char **argv)
     else
         cache = NULL;
 
-    shared_ptr<FawnKVServerHandler> handler(new FawnKVServerHandler(fe, cache));
-    shared_ptr<TProcessor> processor(new FawnKVProcessor(handler));
-    shared_ptr<TServerTransport> serverTransport(new TServerSocket(listenPort));
-    shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
-    shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
+    boost::shared_ptr<FawnKVServerHandler> handler(new FawnKVServerHandler(fe, cache));
+    boost::shared_ptr<TProcessor> processor(new FawnKVProcessor(handler));
+    boost::shared_ptr<TServerTransport> serverTransport(new TServerSocket(listenPort));
+    boost::shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
+    boost::shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
 
     TThreadedServer server(processor, serverTransport, transportFactory, protocolFactory);
     server.serve();

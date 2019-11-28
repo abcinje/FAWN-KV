@@ -9,11 +9,11 @@
 #include "FawnKVFrontend.h"
 #include "FawnKVManager.h"
 
-#include <protocol/TBinaryProtocol.h>
-#include <server/TThreadedServer.h>
-#include <transport/TSocket.h>
-#include <transport/TServerSocket.h>
-#include <transport/TBufferTransports.h>
+#include <thrift/protocol/TBinaryProtocol.h>
+#include <thrift/server/TThreadedServer.h>
+#include <thrift/transport/TSocket.h>
+#include <thrift/transport/TServerSocket.h>
+#include <thrift/transport/TBufferTransports.h>
 
 using namespace ::apache::thrift;
 using namespace ::apache::thrift::protocol;
@@ -40,7 +40,7 @@ class FrontEnd : virtual public FawnKVFrontendIf
     void (*put_w_cb)(unsigned int, int64_t); // continuation, version
     void (*get_cb)(const DBID&, const string&, unsigned int, bool); // key, val, continuation, success
 
-    shared_ptr<TTransport> manager_transport;
+    boost::shared_ptr<TTransport> manager_transport;
     map<string, FawnKVBackendClient*> ip_client_map;
     map<string, pthread_mutex_t*> ip_socketlock_map;
 

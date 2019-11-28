@@ -11,15 +11,15 @@
 #include "print.h"
 #include "Manager.h"
 
-#include <concurrency/ThreadManager.h>
-#include <concurrency/PosixThreadFactory.h>
-#include <protocol/TBinaryProtocol.h>
-#include <server/TSimpleServer.h>
-#include <server/TThreadPoolServer.h>
-#include <server/TThreadedServer.h>
-#include <transport/TServerSocket.h>
-#include <transport/TTransportUtils.h>
-#include <transport/TSocket.h>
+#include <thrift/concurrency/ThreadManager.h>
+#include <thrift/concurrency/PosixThreadFactory.h>
+#include <thrift/protocol/TBinaryProtocol.h>
+#include <thrift/server/TSimpleServer.h>
+#include <thrift/server/TThreadPoolServer.h>
+#include <thrift/server/TThreadedServer.h>
+#include <thrift/transport/TServerSocket.h>
+#include <thrift/transport/TTransportUtils.h>
+#include <thrift/transport/TSocket.h>
 
 using namespace apache::thrift;
 using namespace apache::thrift::protocol;
@@ -1417,11 +1417,11 @@ void *localServerThreadLoop(void *p)
     Manager *m = (Manager*) p;
 
     int port = MANAGER_PORT_BASE;
-    shared_ptr<Manager> handler(m);
-    shared_ptr<TProcessor> processor(new FawnKVManagerProcessor(handler));
-    shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
-    shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
-    shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
+    boost::shared_ptr<Manager> handler(m);
+    boost::shared_ptr<TProcessor> processor(new FawnKVManagerProcessor(handler));
+    boost::shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
+    boost::shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
+    boost::shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
 
     TThreadedServer server(processor, serverTransport, transportFactory, protocolFactory);
     server.serve();

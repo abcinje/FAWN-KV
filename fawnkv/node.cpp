@@ -5,15 +5,15 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
-#include <concurrency/ThreadManager.h>
-#include <concurrency/PosixThreadFactory.h>
-#include <protocol/TBinaryProtocol.h>
-#include <server/TSimpleServer.h>
-#include <server/TThreadPoolServer.h>
-#include <server/TThreadedServer.h>
-#include <transport/TServerSocket.h>
-#include <transport/TTransportUtils.h>
-#include <transport/TSocket.h>
+#include <thrift/concurrency/ThreadManager.h>
+#include <thrift/concurrency/PosixThreadFactory.h>
+#include <thrift/protocol/TBinaryProtocol.h>
+#include <thrift/server/TSimpleServer.h>
+#include <thrift/server/TThreadPoolServer.h>
+#include <thrift/server/TThreadedServer.h>
+#include <thrift/transport/TServerSocket.h>
+#include <thrift/transport/TTransportUtils.h>
+#include <thrift/transport/TSocket.h>
 
 
 #include "dbid.h"
@@ -47,10 +47,10 @@ Node::Node(string ip, int p, bool connect) :
 
     if (connect) {
         // Connect to ip
-        shared_ptr<TTransport> socket(new TSocket(IP.data(), port));
-        shared_ptr<TTransport> transport(new TBufferedTransport(socket));
+        boost::shared_ptr<TTransport> socket(new TSocket(IP.data(), port));
+        boost::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
         be_transport = transport;
-        shared_ptr<TProtocol> protocol(new TBinaryProtocol(be_transport));
+        boost::shared_ptr<TProtocol> protocol(new TBinaryProtocol(be_transport));
         backend = new FawnKVBackendClient(protocol);
 
         while (1) {

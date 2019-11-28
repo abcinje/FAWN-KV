@@ -160,7 +160,7 @@ namespace fawn {
         string filename_;
         off_t currSplit;
 
-        static const double EXCESS_BUCKET_FACTOR = 1.1;
+        static constexpr double EXCESS_BUCKET_FACTOR = 1.1;
     };
 
 }  // namespace fawn
