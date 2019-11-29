@@ -52,3 +52,9 @@ test/management/lattester
 test/management/ringtester
 utils/dbid_test
 fawnkv-0.1.tar.gz
+compile
+m4/libtool.m4
+m4/ltoptions.m4
+m4/ltsugar.m4
+m4/ltversion.m4
+m4/lt~obsolete.m4
