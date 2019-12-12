@@ -32,6 +32,8 @@ import org.apache.thrift.server.TSimpleServer;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TServerTransport;
 
+import java.nio.ByteBuffer;
+
 public class FawnKVClt {
     public FawnKVClt(String frontendIP, int port, String clientIP, int myPort)
     {
@@ -71,7 +73,7 @@ public class FawnKVClt {
 	synchronized(myMonitorObject) {
 
 	    try {
-		client.get(key.getBytes(), continuation, cid);
+		client.get(ByteBuffer.wrap(key.getBytes()), continuation, cid);
 		continuation++;
 	    } catch (TException x) {
 		x.printStackTrace();
@@ -94,7 +96,7 @@ public class FawnKVClt {
     public void put(String key, String value) {
 	synchronized(myMonitorObject) {
 	    try {
-		client.put(key.getBytes(), value.getBytes(), continuation, cid);
+		client.put(ByteBuffer.wrap(key.getBytes()), ByteBuffer.wrap(value.getBytes()), continuation, cid);
 		continuation++;
 	    } catch (TException x) {
 		x.printStackTrace();
@@ -118,7 +120,7 @@ public class FawnKVClt {
     public void remove(String key) {
 	synchronized(myMonitorObject) {
 	    try {
-		client.remove(key.getBytes(), continuation, cid);
+		client.remove(ByteBuffer.wrap(key.getBytes()), continuation, cid);
 		continuation++;
 	    } catch (TException x) {
 		x.printStackTrace();
@@ -155,11 +157,13 @@ public class FawnKVClt {
 	    client = c;
 	}
 
-	public void get_response(byte[] value, long continuation)
+	public void get_response(ByteBuffer value, long continuation)
 	{
+	    byte[] bytes = new byte[value.remaining()];
+	    value.get(bytes);
 	    synchronized(client.myMonitorObject) {
 		client.has_data = true;
-		client.data = new String(value);
+		client.data = new String(bytes);
 		client.myMonitorObject.notify();
 	    }
 	}
