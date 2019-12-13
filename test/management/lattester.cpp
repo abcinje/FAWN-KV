@@ -450,7 +450,7 @@ void simple_test(FrontEnd *fe, int msg_size)
 int main(int argc, char **argv)
 {
 
-    if (argc < 2) {
+    if (argc < 5) {
         usage();
         exit(-1);
     }
