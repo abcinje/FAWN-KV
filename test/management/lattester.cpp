@@ -181,29 +181,18 @@ void maintenance_test(FrontEnd *fe, int msg_size)
 	    if (val < ratio) {
 		fe->put(key, value_put, 2);
 	    } else {
-		// disable split if i == -1
-		if (i == 5000) {
-		    printf("Split req\n");
-		    int num2 = 0;
-		    string ps_key2((const char*)&num2, sizeof(num2));
-		    uint32_t key_id2 = HashUtil::BobHash(ps_key2);
-		    string key2((char *)&key_id2, sizeof(uint32_t));
-		    sleep(2);
-		    fe->get(key2, (uint64_t)-1);
-                } else {
-		    //gettimeofday(&t, NULL);
-		    int num2 = (*l)[i];
-		    string ps_key2((const char*)&num2, sizeof(num2));
-		    uint32_t key_id2 = HashUtil::BobHash(ps_key2);
-		    string key2((char *)&key_id2, sizeof(uint32_t));
-                    gettimeofday(&t, NULL);
-                    lt1->push_back(t.tv_sec);
-                    lt2->push_back(t.tv_usec);
-		    fe->get(key2, cont);
-		    //fe->put(key2, &value, cont);
-		    //cout << cont << "\t" << t.tv_sec << "\t" << t.tv_usec << endl;
-		    cont++;
-                }
+		//gettimeofday(&t, NULL);
+		int num2 = (*l)[i];
+		string ps_key2((const char*)&num2, sizeof(num2));
+		uint32_t key_id2 = HashUtil::BobHash(ps_key2);
+		string key2((char *)&key_id2, sizeof(uint32_t));
+                gettimeofday(&t, NULL);
+                lt1->push_back(t.tv_sec);
+                lt2->push_back(t.tv_usec);
+		fe->get(key2, cont);
+		//fe->put(key2, &value, cont);
+		//cout << cont << "\t" << t.tv_sec << "\t" << t.tv_usec << endl;
+		cont++;
 	    }
 
 
