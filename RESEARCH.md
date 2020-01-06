@@ -1,5 +1,8 @@
 ## RESEARCH
 
+### To build and install
+See [INSTALL](INSTALL) document.
+
 ### Troubleshooting
 - `gtest_main` not found:  
   Download `libgtest-dev` package and build it.  
