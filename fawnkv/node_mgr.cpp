@@ -455,12 +455,13 @@ void usage()
          <<   "   -p         self port \n"
          <<   "   -v [#]     # of virtual nodes this node represents and also indicates # of db files to follow separated by spaces \n"
          <<   "   -b path    base path/name for db file, e.g.: /localfs/fawnds_ \n"
+         <<   "   -d dev     NVMe device path for db, e.g.: /dev/nvme0n1 \n"
          <<   "   -t [#]     # of threads to spawn for concurrent I/O operations \n"
          <<   "   -j         static join without knowing your IDs.\n"
          <<   "   -o         overwrite existing DS if it already exists.\n"
          <<   "   -s [name]  stat file name \n";
 
-    cerr <<   "Example: ./backend -m 128.2.223.35 -i 128.2.223.35 -b \"/localfs/fawndb_ /localfs2/fawndb_\" -o" << endl;
+    cerr <<   "Example: ./backend -m 128.2.223.35 -i 128.2.223.35 -b \"/localfs/fawndb_\" -d \"/dev/nvme0n1\" -o" << endl;
 }
 
 
