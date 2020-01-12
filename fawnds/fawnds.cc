@@ -26,6 +26,9 @@
 #include "print.h"
 #include "timing.h"
 
+#include <sys/ioctl.h>
+#include "KVSSD/linux_nvme_ioctl.h"
+
 using fawn::DataHeader;
 using fawn::Hashes;
 using fawn::HashUtil;
@@ -48,6 +51,7 @@ namespace fawn {
 
     template <typename T>
     FawnDS<T>* FawnDS<T>::Create_FawnDS(const char* filename,
+                                        const char* dev,
                                         uint64_t hash_table_size,
                                         double max_deleted_ratio,
                                         double max_load_factor,
@@ -55,13 +59,27 @@ namespace fawn {
     {
         if (filename == NULL)
             return NULL;
+
         int fd;
         if ((fd = open(filename, O_RDWR|O_CREAT|O_NOATIME, 0666)) == -1) {
             perror("Could not open file\n");
             return NULL;
         }
 
-        return FawnDS<T>::Create_FawnDS_From_Fd(fd, filename,
+        int nvmefd;
+        if ((nvmefd = open(dev, O_RDWR)) < 0) {
+            perror("Could not open device\n");
+            return NULL;
+        }
+
+        unsigned int nsid;
+        if ((nsid = ioctl(nvmefd, NVME_IOCTL_ID)) == (unsigned int)-1) {
+            perror("Could not get nsid for device\n");
+            return NULL;
+        }
+
+        return FawnDS<T>::Create_FawnDS_From_Fd(fd, nvmefd, nsid,
+                                                filename, dev,
                                                 hash_table_size * FawnDS<T>::EXCESS_BUCKET_FACTOR,
                                                 0, // empty
                                                 0, // hashtable
@@ -86,8 +104,9 @@ namespace fawn {
 
 
     template <typename T>
-    FawnDS<T>* FawnDS<T>::Create_FawnDS_From_Fd(int fd,
+    FawnDS<T>* FawnDS<T>::Create_FawnDS_From_Fd(int fd, int nvmefd, unsigned int nsid,
                                                 const string& filename,
+                                                const string& dev,
                                                 uint64_t hash_table_size,
                                                 uint64_t num_entries,
                                                 uint64_t deleted_entries,
@@ -95,7 +114,7 @@ namespace fawn {
                                                 double max_load_factor,
                                                 keyType kt)
     {
-        if (fd < 0)
+        if (fd < 0 || nvmefd < 0)
             return NULL;
 
         // Calculate hashtable size based on number of entries and other hashtable parameters
@@ -132,9 +151,11 @@ namespace fawn {
             return NULL;
         }
 
-        FawnDS<T>* ds = new FawnDS<T>(filename, kt);
+        FawnDS<T>* ds = new FawnDS<T>(filename, dev, kt);
         ds->fd_ = fd;
-        ds->datastore = new T(fd);
+        ds->nvmefd_ = nvmefd;
+        ds->nsid_ = nsid;
+        ds->datastore = new T(fd, nvmefd, nsid);
         ds->disable_readahead();
 
 
@@ -302,9 +323,9 @@ namespace fawn {
 
 
     template <typename T>
-    FawnDS<T>* FawnDS<T>::Open_FawnDS(const char* filename, keyType hashtable_store)
+    FawnDS<T>* FawnDS<T>::Open_FawnDS(const char* filename, const char* dev, keyType hashtable_store)
     {
-        FawnDS<T>* ds = new FawnDS<T>(filename, hashtable_store);
+        FawnDS<T>* ds = new FawnDS<T>(filename, dev, hashtable_store);
         if (!ds->ReopenFawnDSFromFilename()) {
             delete ds;
             return NULL;
@@ -332,8 +353,23 @@ namespace fawn {
             return NULL;
         }
 
+        int nvmefd;
+        if ((nvmefd = open(dev_.c_str(), O_RDWR)) < 0) {
+            perror(dev_.c_str());
+            return false;
+        }
+
+        unsigned int nsid;
+        if ((nsid = ioctl(nvmefd, NVME_IOCTL_ID)) == (unsigned int)-1) {
+            perror(dev_.c_str());
+            return false;
+        }
+
         fd_ = fd;
-        datastore = new T(fd);
+        nvmefd_ = nvmefd;
+        nsid_ = nsid;
+
+        datastore = new T(fd, nvmefd, nsid);
 
         if (!ReopenFawnDSFromFd()) {
             return false;
@@ -385,14 +421,16 @@ namespace fawn {
 
         if (fd_ != -1)
             close(fd_);
+        if (nvmefd_ != -1)
+            close(nvmefd_);
 
         delete datastore;
     }
 
     template <typename T>
-    FawnDS<T>::FawnDS(const string& filename, keyType kt) :
-        fd_(-1), header_(NULL), hash_table_(NULL),
-        filename_(filename)
+    FawnDS<T>::FawnDS(const string& filename, const string& dev, keyType kt) :
+        fd_(-1), nvmefd_(-1), nsid_(-1), header_(NULL), hash_table_(NULL),
+        filename_(filename), dev_(dev)
     {
         if (kt == RANDOM_KEYS) {
             Hashes::hashes[0] = Hashes::nullhash1;
@@ -574,8 +612,22 @@ namespace fawn {
         const string temp_filename(tfn);
         free(tfn);
 
-        FawnDS<T>* new_db = FawnDS<T>::Create_FawnDS_From_Fd(fd,
-                                                             temp_filename,
+        string dev(dev_);
+
+        int nvmefd;
+        if ((nvmefd = open(dev.c_str(), O_RDWR)) < 0) {
+            fprintf(stderr, "Could not open device\n");
+            return NULL;
+        }
+
+        unsigned int nsid;
+        if ((nsid = ioctl(nvmefd, NVME_IOCTL_ID)) == (unsigned int)-1) {
+            fprintf(stderr, "Could not get nsid for device\n");
+            return NULL;
+        }
+
+        FawnDS<T>* new_db = FawnDS<T>::Create_FawnDS_From_Fd(fd, nvmefd, nsid,
+                                                             temp_filename, dev,
                                                              header_->hashtable_size,
                                                              header_->number_elements,
                                                              header_->deleted_elements,
@@ -727,6 +779,7 @@ namespace fawn {
 
         // Rename local
         filename_ = old->filename_;
+        dev_ = old->dev_;
 
         // Eliminate old
         delete old;

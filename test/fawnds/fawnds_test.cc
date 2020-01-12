@@ -15,11 +15,11 @@ namespace fawn {
         // Code here will be called immediately after the constructor (right before
         // each test).
         virtual void SetUp() {
-            h = FawnDS<FawnDS_Flash>::Create_FawnDS("/localfs/fawn_db", num_records_, max_deleted_ratio_,
+            h = FawnDS<FawnDS_Flash>::Create_FawnDS("/localfs/fawn_db", "/dev/nvme0n1", num_records_, max_deleted_ratio_,
                                                     max_load_factor_, RANDOM_KEYS);
             //h = FawnDS::Open_FawnDS("/localfs/fawn_db");
 
-            h2 = FawnDS<FawnDS_Flash>::Create_FawnDS("/localfs/fawn_db2", num_records_, max_deleted_ratio_,
+            h2 = FawnDS<FawnDS_Flash>::Create_FawnDS("/localfs/fawn_db2", "/dev/nvme0n1", num_records_, max_deleted_ratio_,
                                                      max_load_factor_, RANDOM_KEYS);
             //h2 = FawnDS::Open_FawnDS("fawn_db2");
         }

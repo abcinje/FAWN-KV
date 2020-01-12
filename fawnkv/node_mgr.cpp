@@ -477,6 +477,7 @@ int main(int argc, char **argv)
     string stat_filename;
     // default
     string filebase("/localfs/fawnds_");
+    string dev("/dev/nvme0n1");
 
     int numConsumerThreads = 1;
     bool unknown_ids = false;
@@ -560,6 +561,9 @@ int main(int argc, char **argv)
             break;
         case 'b':
             filebase = optarg;
+            break;
+        case 'd':
+            dev = optarg;
             break;
         case 'o':
             overwriteExistingDS = true;

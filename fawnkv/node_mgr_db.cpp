@@ -93,6 +93,7 @@ interval_db* node_mgr::init_interval_db(const string endid, const string my_vid,
         cout << "[init_interval_db]  Interval is [" << bytes_to_hex(startid) << " , "  << bytes_to_hex(endid) << " ] " << endl;
         cout << "Creating file (init): " << filename << endl;
         i->h = fawn::FawnDS<FawnDS_Flash>::Create_FawnDS(filename.c_str(),
+                                           dev.c_str(),
                                            NUM_RECORD_INIT,
                                            .9,
                                            .8,
@@ -104,7 +105,7 @@ interval_db* node_mgr::init_interval_db(const string endid, const string my_vid,
     } else {
         cout << "[init_interval_db] startid isnt set" << endl;
         cout << "Opening file: " << filename << endl;
-        i->h = fawn::FawnDS<FawnDS_Flash>::Open_FawnDS(filename.c_str(), TEXT_KEYS);
+        i->h = fawn::FawnDS<FawnDS_Flash>::Open_FawnDS(filename.c_str(), dev.c_str(), TEXT_KEYS);
     }
     i->valid = true;
     i->tempDS = NULL;
@@ -140,6 +141,7 @@ FawnDS<FawnDS_Flash>* node_mgr::createTempStore(const string& startid_str, const
         filename.resize(255);
     cout << "Creating temporary file: " << filename << endl;
     FawnDS<FawnDS_Flash>* tempDS = fawn::FawnDS<FawnDS_Flash>::Create_FawnDS(filename.c_str(),
+                                                 dev.c_str(),
                                                  NUM_RECORD_INIT_TEMP,
                                                  0.9,
                                                  0.8,

@@ -216,6 +216,7 @@ public:
     string myIP;
     int myPort;
     string filebase;
+    string dev;
     uint32_t num_precopies;
     bool unknown_ids;
     tbb::atomic<uint32_t> num_network;

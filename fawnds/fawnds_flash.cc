@@ -27,6 +27,9 @@
 #include "print.h"
 #include "timing.h"
 
+#include "KVSSD/linux_nvme_ioctl.h"
+#include "KVSSD/kv_nvme.h"
+
 using fawn::DataHeader;
 using fawn::Hashes;
 using fawn::HashUtil;
@@ -34,6 +37,8 @@ using fawn::HashUtil;
 #ifndef O_NOATIME
 #define O_NOATIME 0  /* O_NOATIME is linux-only */
 #endif
+
+#define DEFAULT_BUF_SIZE (4096)
 
 namespace fawn {
     /***************************************************/
@@ -65,6 +70,28 @@ namespace fawn {
             return false;
         }
 
+        /* KVSSD */
+        int ret = 0;
+        char *buf = NULL;
+
+        if (length) {
+            int alloc_len = ((length % 4) ? length + (4 - (length % 4)) : length);
+            posix_memalign((void **)&buf, 4096, alloc_len);
+            if (!buf) {
+                printf("Could not alloc buf size %d\n", length);
+                return false;
+            }
+
+            strncpy(buf, data, length);
+            buf[length - 1] = 0;
+        }
+
+        ret = nvme_kv_store(0, nvmefd_, nsid_, key, key_len, buf, (int)length, 0, STORE_OPTION_NOTHING);
+        if (ret) {
+            fprintf(stderr, "Fail to store\n");
+            return false;
+        }
+
         return true;
     }
 
@@ -88,6 +115,15 @@ namespace fawn {
                                offset + sizeof(struct DataHeader)) != key_len) {
             fprintf(stderr, "Could not write delete header at position %" PRIu64 ": %s\n",
                     (uint64_t)offset + sizeof(struct DataHeader), strerror(errno));
+            return false;
+        }
+
+        /* KVSSD */
+        int ret = 0;
+
+        ret = nvme_kv_delete(0, nvmefd_, nsid_, key, key_len, DELETE_OPTION_NOTHING);
+        if (ret) {
+            fprintf(stderr, "Fail to delete\n");
             return false;
         }
 
@@ -167,10 +203,30 @@ namespace fawn {
              * "start" pointer into the buffer so we never have to copy
              * regardless of how we get the data.  */
         }
+
+        /* KVSSD */
+        int ret;
+        int value_len = DEFAULT_BUF_SIZE;
+        char *buf = NULL;
+
+        if (value_len) {
+            buf = new char[value_len]();
+            if (!buf) {
+                printf("Could not alloc buf size %d\n", value_len);
+                return false;
+            }
+        }
+
+        ret = nvme_kv_retrieve(0, nvmefd_, nsid_, key, key_len, buf, &value_len, 0, RETRIEVE_OPTION_NOTHING);
+        if (ret) {
+            fprintf(stderr, "Fail to retrieve\n");
+            return false;
+        }
+
+        buf[value_len - 1] = 0;
+        data.assign(buf, value_len);
+        delete []buf;
+
         return true;
     }
-
-
-
-
 }  // namespace fawn

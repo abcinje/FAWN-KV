@@ -23,14 +23,15 @@ namespace fawn {
 
     class FawnDS_Flash {
     public:
-        FawnDS_Flash(int fd) : fd_(fd) {}
+        FawnDS_Flash(int fd, int nvmefd, unsigned int nsid) : fd_(fd), nvmefd_(nvmefd), nsid_(nsid) {}
         ~FawnDS_Flash() {}
         bool Write(const char* key, uint32_t key_len, const char* data, uint32_t length, off_t offset);
         bool Delete(const char* key, uint32_t key_len, off_t offset);
         bool ReadIntoHeader(off_t offset, DataHeader &data_header, string &key);// const;
         bool Read(const char* key, uint32_t key_len, off_t offset, string &data);// const;
     private:
-        int fd_;
+        int fd_, nvmefd_;
+        unsigned int nsid_;
     };
 
 }  // namespace fawn

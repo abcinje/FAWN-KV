@@ -7,7 +7,8 @@ fawnds_test_CPPFLAGS = 				\
 	-I$(top_builddir)/fawnds		\
 	-I$(top_builddir)/fawnds/gen-cpp
 
-fawnds_test_LDADD = 				\
-	$(top_builddir)/fawnds/libfawnds.la 	\
-	$(top_builddir)/utils/libfawnkvutils.la \
+fawnds_test_LDADD = 					\
+	$(top_builddir)/fawnds/libfawnds.la 		\
+	$(top_builddir)/fawnds/KVSSD/libkvnvme.la	\
+	$(top_builddir)/utils/libfawnkvutils.la		\
 	$(THRIFT_LIBS)

@@ -85,6 +85,7 @@ backend_SOURCES = node_mgr_db.cpp node_mgr.cpp node_mgr.h FawnKVBackendHandler.c
 
 backend_LDADD = 				\
     $(top_builddir)/fawnds/libfawnds.la 	\
+    $(top_builddir)/fawnds/KVSSD/libkvnvme.la  \
     $(top_builddir)/utils/libfawnkvutils.la	\
     libfawnkv.la				\
     $(THRIFT_LIBS)

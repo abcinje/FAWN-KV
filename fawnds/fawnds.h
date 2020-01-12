@@ -28,12 +28,12 @@ namespace fawn {
     template <typename T>
     class FawnDS {
     public:
-        static FawnDS<T>* Create_FawnDS(const char* filename, uint64_t hash_table_size,
+        static FawnDS<T>* Create_FawnDS(const char* filename, const char* dev, uint64_t hash_table_size,
                                         double max_deleted_ratio, double max_load_factor,
                                         keyType kt = TEXT_KEYS)
             __attribute__ ((warn_unused_result));
 
-        static FawnDS<T>* Open_FawnDS(const char* filename, keyType kt = TEXT_KEYS);
+        static FawnDS<T>* Open_FawnDS(const char* filename, const char* dev, keyType kt = TEXT_KEYS);
 
         const DBID* getStartID() const;
         const DBID* getEndID() const;
@@ -86,7 +86,7 @@ namespace fawn {
 
         bool deleteFile();
     private:
-        FawnDS<T>(const string& filename, keyType storeType);
+        FawnDS<T>(const string& filename, const string& dev, keyType storeType);
         inline uint16_t keyfragment_from_key(const char* key, uint32_t key_len) const;
 
         // Locate the hashtable entry that this key occupies or would occupy. Methods
@@ -108,8 +108,9 @@ namespace fawn {
         // Merge() or Split() methods on the returned object.
 
         // Helper function to malloc or mmap header/hashtable
-        static FawnDS<T>* Create_FawnDS_From_Fd(int fd,
+        static FawnDS<T>* Create_FawnDS_From_Fd(int fd, int nvmefd, unsigned int nsid,
                                                 const string& filename,
+                                                const string& dev,
                                                 uint64_t hash_table_size,
                                                 uint64_t number_entries,
                                                 uint64_t deleted_entries,
@@ -153,11 +154,12 @@ namespace fawn {
 
         int disable_readahead();
 
-        int fd_;
+        int fd_, nvmefd_;
+        unsigned int nsid_;
         struct DbHeader* header_;
         struct HashEntry* hash_table_;
         T* datastore;
-        string filename_;
+        string filename_, dev_;
         off_t currSplit;
 
         static constexpr double EXCESS_BUCKET_FACTOR = 1.1;
