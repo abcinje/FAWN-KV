@@ -490,7 +490,7 @@ int main(int argc, char **argv)
     bool static_init = false;
     bool sendJoinMsg = true;
 
-    while ((ch = getopt(argc, argv, "hm:i:p:v:s:b:t:n:jro")) != -1) {
+    while ((ch = getopt(argc, argv, "hm:i:p:v:s:b:d:t:n:jro")) != -1) {
         switch (ch) {
         case 'm':
             managerIP = optarg;
@@ -598,6 +598,7 @@ int main(int argc, char **argv)
     nm->numThreads = numConsumerThreads;
     nm->myPort = port;
     nm->filebase = filebase;
+    nm->dev = dev;
 
     pthread_t localServerThreadId_;
     int code = pthread_create(&localServerThreadId_, NULL,
