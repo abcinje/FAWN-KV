@@ -657,7 +657,7 @@ int main(int argc, char **argv)
     void (*testfn)(FrontEnd *, int) = join_test;
     int ch;
 
-    while ((ch = getopt(argc, argv, "pgGbmsicden:k:")) != -1)
+    while ((ch = getopt(argc, argv, "pgGbmsiden:k:")) != -1)
 	switch (ch) {
 	case 'p': testfn = put_test; break;
 	case 'g': testfn = get_test; break;
@@ -705,6 +705,8 @@ int main(int argc, char **argv)
 
     outstanding = 0;
     (*testfn)(fe, msg_size);
+
+    cout << "*** END of the test ***" << endl;
 
     pthread_join(localThreadId_, NULL);
     cout << "Exiting front-end manager." << endl;
